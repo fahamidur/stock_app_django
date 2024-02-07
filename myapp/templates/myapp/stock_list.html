@@ -1,0 +1,99 @@
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f8f8f8;
+        margin: 0;
+        padding: 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        border: 1px solid #e0e0e0;
+        text-align: left;
+        padding: 12px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .edit-btn {
+        cursor: pointer;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    .edit-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<table id="editable-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Trade Code</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Open</th>
+            <th>Close</th>
+            <th>Volume</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in stocks|slice:":5" %}
+            <tr>
+                <td contenteditable="true">{{ stock.date }}</td>
+                <td contenteditable="true">{{ stock.trade_code }}</td>
+                <td contenteditable="true">{{ stock.high }}</td>
+                <td contenteditable="true">{{ stock.low }}</td>
+                <td contenteditable="true">{{ stock.open }}</td>
+                <td contenteditable="true">{{ stock.close }}</td>
+                <td contenteditable="true">{{ stock.volume }}</td>
+                <td>
+                    <button class="edit-btn">Edit</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var table = document.getElementById('editable-table');
+
+        table.addEventListener('click', function(e) {
+            var target = e.target;
+
+            if (target.classList.contains('edit-btn')) {
+                var row = target.closest('tr');
+                toggleEditable(row);
+            }
+        });
+
+        function toggleEditable(row) {
+            var cells = row.cells;
+
+            for (var i = 0; i < cells.length - 1; i++) {
+                var cell = cells[i];
+                cell.contentEditable = !cell.isContentEditable;
+            }
+        }
+    });
+</script>
