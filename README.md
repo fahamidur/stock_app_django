@@ -1,4 +1,12 @@
-Certainly! Below is a template for a README file summarizing the work done in both branches. Please customize it according to your project's specifics.
+# Screenshot
+- **Line Graph** 
+![Line Graph](image\1.JPG)
+
+- **Candle Stick Graph** 
+![Candle Stick Graph](image\2.JPG)
+
+- **Data Table** 
+![Data Table](image\3.JPG)
 
 ```markdown
 # Stock Market Django App
