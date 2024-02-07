@@ -41,8 +41,25 @@
     .edit-btn:hover {
         background-color: #0056b3;
     }
+
+    canvas {
+        display: block;
+        margin: 20px auto;
+        max-width: 800px;
+    }
 </style>
 
+<!-- Add this Plotly line graph above the table -->
+<h1>Line Graph</h1>
+<div id="lineGraph"></div>
+
+<!-- Add this Plotly candlestick chart above the table -->
+<h1>Candlestick Chart</h1>
+
+<div id="candlestickChart"></div>
+
+<!-- Existing table -->
+<h1>Data In Table</h1>
 <table id="editable-table">
     <thead>
         <tr>
@@ -57,8 +74,8 @@
         </tr>
     </thead>
     <tbody>
-        {% for stock in stocks|slice:":5" %}
-            <tr>
+        {% for stock in stocks|slice:":10"%}
+            <tr data-trade-code="{{ stock.trade_code }}">
                 <td contenteditable="true">{{ stock.date }}</td>
                 <td contenteditable="true">{{ stock.trade_code }}</td>
                 <td contenteditable="true">{{ stock.high }}</td>
@@ -74,26 +91,104 @@
     </tbody>
 </table>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var table = document.getElementById('editable-table');
+    // Original data for Plotly charts
+    var allStocks = [
+        {% for stock in stocks|slice:":50" %}
+            {
+                date: "{{ stock.date }}",
+                trade_code: "{{ stock.trade_code }}",
+                high: "{{ stock.high }}",
+                low: "{{ stock.low }}",
+                open: "{{ stock.open }}",
+                close: "{{ stock.close }}",
+                volume: "{{ stock.volume }}"
+            },
+        {% endfor %}
+    ];
 
-        table.addEventListener('click', function(e) {
-            var target = e.target;
+    // Get unique trade codes
+    var tradeCodes = Array.from(new Set(allStocks.map(stock => stock.trade_code)));
 
-            if (target.classList.contains('edit-btn')) {
-                var row = target.closest('tr');
-                toggleEditable(row);
+    // Create initial data for Plotly charts
+    var initialData = filterData(null);
+
+    // Create initial charts
+    createLineGraph(initialData.lineGraphData, initialData.lineGraphLayout, 'lineGraph');
+    createCandlestickChart(initialData.candlestickData, initialData.candlestickLayout, 'candlestickChart');
+
+    function filterData(selectedTradeCode) {
+        var filteredStocks = selectedTradeCode ?
+            allStocks.filter(stock => stock.trade_code === selectedTradeCode) :
+            allStocks;
+
+        // Data for line graph
+        var lineGraphData = [{
+            x: filteredStocks.map(stock => stock.date),
+            y: filteredStocks.map(stock => stock.close),
+            type: 'scatter',
+            mode: 'lines+markers',
+            marker: { color: 'blue' },
+            line: { color: 'blue' }
+        }];
+
+        // Layout for line graph
+        var lineGraphLayout = {
+            title: 'Closing Prices Over Time',
+            xaxis: {
+                title: 'Date'
+            },
+            yaxis: {
+                title: 'Close Price'
             }
-        });
+        };
 
-        function toggleEditable(row) {
-            var cells = row.cells;
+        // Data for candlestick chart
+        var candlestickData = [{
+            x: filteredStocks.map(stock => stock.date),
+            close: filteredStocks.map(stock => stock.close),
+            high: filteredStocks.map(stock => stock.high),
+            low: filteredStocks.map(stock => stock.low),
+            open: filteredStocks.map(stock => stock.open),
+            type: 'candlestick',
+            name: 'Candlesticks',
+            showlegend: false
+        }];
 
-            for (var i = 0; i < cells.length - 1; i++) {
-                var cell = cells[i];
-                cell.contentEditable = !cell.isContentEditable;
+        // Layout for candlestick chart
+        var candlestickLayout = {
+            title: 'Candlestick Chart',
+            xaxis: {
+                title: 'Date'
+            },
+            yaxis: {
+                title: 'Stock Price'
             }
-        }
-    });
+        };
+
+        return {
+            lineGraphData: lineGraphData,
+            lineGraphLayout: lineGraphLayout,
+            candlestickData: candlestickData,
+            candlestickLayout: candlestickLayout
+        };
+    }
+
+    function createLineGraph(data, layout, elementId) {
+        Plotly.newPlot(elementId, data, layout);
+    }
+
+    function createCandlestickChart(data, layout, elementId) {
+        Plotly.newPlot(elementId, data, layout);
+    }
+
+    function updateCharts(dropdownId) {
+        var selectedTradeCode = document.getElementById(dropdownId).value;
+
+        var filteredData = filterData(selectedTradeCode);
+
+        createLineGraph(filteredData.lineGraphData, filteredData.lineGraphLayout, 'lineGraph');
+        createCandlestickChart(filteredData.candlestickData, filteredData.candlestickLayout, 'candlestickChart');
+    }
 </script>
