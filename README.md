@@ -1,12 +1,12 @@
 # Screenshot
 - **Line Graph** 
-![Line Graph](.\image\1.JPG)
+![Line Graph](./image/1.JPG)
 
 - **Candle Stick Graph** 
-![Candle Stick Graph](.\image\2.JPG)
+![Candle Stick Graph](./image/2.JPG)
 
 - **Data Table** 
-![Data Table](.\image\3.JPG)
+![Data Table](./image/3.JPG)
 
 ```markdown
 # Stock Market Django App
